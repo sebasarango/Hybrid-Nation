@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hybrid Nation | Resultados Test Físico</title>
+
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #101828;
+      --muted: #667085;
+      --border: #e4e7ec;
+      --accent: #111827;
+      --good: #027a48;
+      --soft: #f9fafb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .hero {
+      background: var(--accent);
+      color: white;
+      padding: 26px 18px;
+      border-radius: 0 0 26px 26px;
+      margin: 0 -16px 18px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      margin: 8px 0 0;
+      font-size: 14px;
+      color: #d1d5db;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 15px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 14px rgba(16, 24, 40, 0.05);
+    }
+
+    .label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .value {
+      font-size: 27px;
+      font-weight: 700;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 22px 0 10px;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 8px;
+    }
+
+    input {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px;
+      font-size: 15px;
+    }
+
+    button {
+      border: 0;
+      background: var(--accent);
+      color: white;
+      border-radius: 12px;
+      padding: 13px 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .notice {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+      margin-top: 8px;
+    }
+
+    .error {
+      display: none;
+      background: #fef3f2;
+      color: #b42318;
+      border: 1px solid #fecdca;
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .result-card {
+      display: none;
+      border-left: 5px solid var(--accent);
+      margin-top: 12px;
+    }
+
+    .result-title {
+      font-size: 21px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      padding: 9px 0;
+      font-size: 14px;
+    }
+
+    .row:last-child {
+      border-bottom: none;
+    }
+
+    .row span {
+      color: var(--muted);
+    }
+
+    .ranking-item {
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ranking-item:last-child {
+      border-bottom: none;
+    }
+
+    .position {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #f2f4f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .athlete-id {
+      font-weight: 700;
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .score {
+      background: #ecfdf3;
+      color: var(--good);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .bar-row {
+      margin-bottom: 13px;
+    }
+
+    .bar-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .bar-bg {
+      height: 10px;
+      background: #eaecf0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 999px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 32px 10px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 480px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 24px;
+      }
+
+      .search-box {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .value {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>Hybrid Nation</h1>
+      <p>Resultados del test físico</p>
+    </section>
+
+    <div id="loading" class="loading">Cargando datos...</div>
+
+    <main id="app" style="display:none;">
+      <section class="grid">
+        <div class="card">
+          <div class="label">Atletas evaluados</div>
+          <div class="value" id="totalAthletes">0</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Score promedio</div>
+          <div class="value" id="avgScore">0 / 24</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Mejor score</div>
+          <div class="value" id="maxScore">0 / 24</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Última fecha</div>
+          <div class="value" id="latestDate" style="font-size:20px;">-</div>
+        </div>
+      </section>
+
+      <div class="section-title">Buscar mi resultado</div>
+
+      <section class="card">
+        <div class="search-box">
+          <input id="searchInput" type="text" placeholder="Ejemplo: ATLETA-001" />
+          <button onclick="searchAthlete()">Buscar</button>
+        </div>
+
+        <div class="notice">
+          Busca tu resultado usando el ID asignado. No uses nombre completo.
+        </div>
+
+        <div id="searchError" class="error">
+          No se encontró ese ID. Verifica que esté escrito exactamente igual.
+        </div>
+
+        <div id="athleteResult" class="card result-card"></div>
+      </section>
+
+      <div class="section-title">Promedio por prueba</div>
+      <section class="card" id="avgTests"></section>
+
+      <div class="section-title">Ranking general</div>
+      <section class="card" id="ranking"></section>
+    </main>
+  </div>
+
+  <script>
+    let rows = [];
+
+    const expectedFields = [
+      'ID_ATLETA',
+      'FECHA_TEST',
+      'GENERO',
+      'PULL_UPS_REPS',
+      'PUSH_UPS_1MIN',
+      'PLANK_SEG',
+      'RUN_1K_SEG',
+      'RUN_1K_MMSS',
+      'BURPEES_1MIN',
+      'SPRINT_100M_SEG',
+      'PTS_PULL_UPS',
+      'PTS_PUSH_UPS',
+      'PTS_PLANK',
+      'PTS_RUN_1K',
+      'PTS_BURPEES',
+      'PTS_SPRINT',
+      'SCORE_TOTAL_24',
+      'NIVEL'
+    ];
+
+    fetch('data.csv')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('No se pudo cargar data.csv');
+        }
+        return response.text();
+      })
+      .then(csv => {
+        rows = parseCSV(csv);
+        rows = rows.filter(row => row.ID_ATLETA && String(row.ID_ATLETA).trim() !== '');
+        renderDashboard(rows);
+      })
+      .catch(error => {
+        document.getElementById('loading').innerHTML =
+          '<div class="error" style="display:block;">Error cargando datos: ' + error.message + '</div>';
+      });
+
+    function parseCSV(text) {
+      const lines = splitCSVLines(text.trim());
+      if (!lines.length) return [];
+
+      const headers = parseCSVLine(lines[0]).map(h => h.trim());
+
+      return lines.slice(1).map(line => {
+        const values = parseCSVLine(line);
+        const obj = {};
+
+        headers.forEach((header, index) => {
+          obj[header] = values[index] !== undefined ? values[index].trim() : '';
+        });
+
+        return obj;
+      });
+    }
+
+    function splitCSVLines(text) {
+      const lines = [];
+      let current = '';
+      let insideQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (char === '"' && next === '"') {
+          current += char;
+          i++;
+        } else if (char === '"') {
+          insideQuotes = !insideQuotes;
+          current += char;
+        } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+          if (current.trim() !== '') lines.push(current);
+          current = '';
+          if (char === '\r' && next === '\n') i++;
+        } else {
+          current += char;
+        }
+      }
+
+      if (current.trim() !== '') lines.push(current);
+      return lines;
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let insideQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const next = line[i + 1];
+
+        if (char === '"' && next === '"') {
+          current += '"';
+          i++;
+        } else if (char === '"') {
+          insideQuotes = !insideQuotes;
+        } else if (char === ',' && !insideQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+
+      result.push(current);
+      return result;
+    }
+
+    function numberValue(value) {
+      if (value === undefined || value === null || value === '') return 0;
+      return Number(String(value).replace(',', '.')) || 0;
+    }
+
+    function average(values) {
+      const clean = values.map(numberValue).filter(v => !isNaN(v));
+      if (!clean.length) return 0;
+      const avg = clean.reduce((a, b) => a + b, 0) / clean.length;
+      return Math.round(avg * 10) / 10;
+    }
+
+    function renderDashboard(data) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+
+      const scores = data.map(r => numberValue(r.SCORE_TOTAL_24));
+      const totalAthletes = data.length;
+      const avgScore = average(scores);
+      const maxScore = scores.length ? Math.max(...scores) : 0;
+      const latestDate = getLatestDate(data);
+
+      document.getElementById('totalAthletes').textContent = totalAthletes;
+      document.getElementById('avgScore').textContent = avgScore + ' / 24';
+      document.getElementById('maxScore').textContent = maxScore + ' / 24';
+      document.getElementById('latestDate').textContent = latestDate || '-';
+
+      renderAverageTests(data);
+      renderRanking(data);
+    }
+
+    function getLatestDate(data) {
+      const dates = data.map(r => r.FECHA_TEST).filter(Boolean).sort();
+      return dates.length ? dates[dates.length - 1] : '';
+    }
+
+    function renderAverageTests(data) {
+      const tests = {
+        'Pull-ups': 'PTS_PULL_UPS',
+        'Push-ups': 'PTS_PUSH_UPS',
+        'Plank': 'PTS_PLANK',
+        'Run 1K': 'PTS_RUN_1K',
+        'Burpees': 'PTS_BURPEES',
+        'Sprint': 'PTS_SPRINT'
+      };
+
+      const container = document.getElementById('avgTests');
+      container.innerHTML = '';
+
+      Object.entries(tests).forEach(([label, field]) => {
+        const value = average(data.map(r => r[field]));
+        const percentage = Math.min((value / 4) * 100, 100);
+
+        container.innerHTML += `
+          <div class="bar-row">
+            <div class="bar-info">
+              <span>${label}</span>
+              <strong>${value} / 4</strong>
+            </div>
+            <div class="bar-bg">
+              <div class="bar-fill" style="width:${percentage}%"></div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderRanking(data) {
+      const container = document.getElementById('ranking');
+
+      const ranking = [...data]
+        .sort((a, b) => numberValue(b.SCORE_TOTAL_24) - numberValue(a.SCORE_TOTAL_24))
+        .slice(0, 20);
+
+      if (!ranking.length) {
+        container.innerHTML = '<div class="small">Todavía no hay resultados registrados.</div>';
+        return;
+      }
+
+      container.innerHTML = '';
+
+      ranking.forEach((item, index) => {
+        container.innerHTML += `
+          <div class="ranking-item">
+            <div class="position">${index + 1}</div>
+            <div>
+              <div class="athlete-id">${item.ID_ATLETA || '-'}</div>
+              <div class="small">${item.GENERO || ''} · ${item.NIVEL || ''}</div>
+            </div>
+            <div class="score">${numberValue(item.SCORE_TOTAL_24)} pts</div>
+          </div>
+        `;
+      });
+    }
+
+    function searchAthlete() {
+      const input = document.getElementById('searchInput').value.trim().toUpperCase();
+      const error = document.getElementById('searchError');
+      const result = document.getElementById('athleteResult');
+
+      error.style.display = 'none';
+      result.style.display = 'none';
+      result.innerHTML = '';
+
+      if (!input) return;
+
+      const athlete = rows.find(row =>
+        String(row.ID_ATLETA || '').trim().toUpperCase() === input
+      );
+
+      if (!athlete) {
+        error.style.display = 'block';
+        return;
+      }
+
+      result.innerHTML = `
+        <div class="result-title">${athlete.ID_ATLETA}</div>
+        <div class="row"><span>Fecha</span><strong>${athlete.FECHA_TEST || '-'}</strong></div>
+        <div class="row"><span>Género</span><strong>${athlete.GENERO || '-'}</strong></div>
+        <div class="row"><span>Score total</span><strong>${numberValue(athlete.SCORE_TOTAL_24)} / 24</strong></div>
+        <div class="row"><span>Nivel</span><strong>${athlete.NIVEL || '-'}</strong></div>
+        <div class="row"><span>Pull-ups</span><strong>${athlete.PULL_UPS_REPS || 0} reps · ${athlete.PTS_PULL_UPS || 0} pts</strong></div>
+        <div class="row"><span>Push-ups</span><strong>${athlete.PUSH_UPS_1MIN || 0} reps · ${athlete.PTS_PUSH_UPS || 0} pts</strong></div>
+        <div class="row"><span>Plank</span><strong>${athlete.PLANK_SEG || 0} seg · ${athlete.PTS_PLANK || 0} pts</strong></div>
+        <div class="row"><span>Run 1K</span><strong>${athlete.RUN_1K_MMSS || athlete.RUN_1K_SEG || '-'} · ${athlete.PTS_RUN_1K || 0} pts</strong></div>
+        <div class="row"><span>Burpees</span><strong>${athlete.BURPEES_1MIN || 0} reps · ${athlete.PTS_BURPEES || 0} pts</strong></div>
+        <div class="row"><span>Sprint 100m</span><strong>${athlete.SPRINT_100M_SEG || 0} seg · ${athlete.PTS_SPRINT || 0} pts</strong></div>
+      `;
+
+      result.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
