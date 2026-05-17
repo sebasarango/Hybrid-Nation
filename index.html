@@ -628,32 +628,49 @@
       });
     }
 
-    function renderRanking(data) {
-      const container = document.getElementById('ranking');
-
+    function renderRankingsSeparated(data) {
+      const masculineRows = data.filter(row => normalizeGender(row.GENERO) === 'masculino');
+      const feminineRows = data.filter(row => normalizeGender(row.GENERO) === 'femenino');
+    
+      renderRankingList('rankingMasculino', masculineRows, 'No hay resultados masculinos registrados.');
+      renderRankingList('rankingFemenino', feminineRows, 'No hay resultados femeninos registrados.');
+    }
+    
+    function renderRankingList(containerId, data, emptyMessage) {
+      const container = document.getElementById(containerId);
+    
       const ranking = [...data]
         .sort((a, b) => numberValue(b.SCORE_TOTAL_24) - numberValue(a.SCORE_TOTAL_24))
         .slice(0, 20);
-
+    
       if (!ranking.length) {
-        container.innerHTML = '<div class="empty">No hay resultados registrados para el filtro seleccionado.</div>';
+        container.innerHTML = `<div class="empty">${emptyMessage}</div>`;
         return;
       }
-
+    
       container.innerHTML = '';
-
+    
       ranking.forEach((item, index) => {
         container.innerHTML += `
           <div class="ranking-item">
             <div class="position">${index + 1}</div>
             <div>
               <div class="athlete-id">${escapeHTML(item.ID_ATLETA || '-')}</div>
-              <div class="small">${escapeHTML(item.GENERO || '')} · ${escapeHTML(item.NIVEL || '')}</div>
+              <div class="small">${escapeHTML(item.NIVEL || '')}</div>
             </div>
             <div class="score">${numberValue(item.SCORE_TOTAL_24)} pts</div>
           </div>
         `;
       });
+    }
+
+function normalizeGender(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
     }
 
     function searchAthlete() {
