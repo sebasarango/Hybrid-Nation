@@ -337,7 +337,8 @@
       'NIVEL'
     ];
 
-    fetch('data.csv')
+    const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRagh7VIkStpb_uBTyWIO2AKtjno986AWp0cDxyj7bqzQSD1zrv3TqF_UW5XcldUokWxRVwO254g7Ql/pub?gid=1016980555&single=true&output=csv';
+    fetch(GOOGLE_SHEET_CSV_URL)
       .then(response => {
         if (!response.ok) {
           throw new Error('No se pudo cargar data.csv');
