@@ -8,17 +8,19 @@
 
   <style>
     :root {
-      --bg: #f3f4f6;
-      --card: #ffffff;
-      --text: #111827;
-      --muted: #6b7280;
-      --border: #e5e7eb;
-      --dark: #111827;
-      --accent: #111827;
-      --good-bg: #ecfdf3;
-      --good-text: #027a48;
-      --error-bg: #fef2f2;
-      --error-text: #b91c1c;
+      --bg: #050505;
+      --card: #111111;
+      --card-soft: #171717;
+      --text: #f5f5f5;
+      --muted: #a3a3a3;
+      --border: #262626;
+      --dark: #050505;
+      --accent: #f5f5f5;
+      --accent-dark: #d4d4d4;
+      --good-bg: #052e1a;
+      --good-text: #4ade80;
+      --error-bg: #2a0d0d;
+      --error-text: #fca5a5;
     }
 
     * {
@@ -36,42 +38,53 @@
       max-width: 780px;
       margin: 0 auto;
       padding: 16px;
+      background: var(--bg);
+      min-height: 100vh;
     }
 
     .hero {
       background: var(--dark);
       color: white;
-      padding: 28px 18px;
-      border-radius: 0 0 28px 28px;
-      margin: 0 -16px 18px;
-      text-align: center;
+      padding: 26px 4px 22px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border);
     }
 
-    .logo-box {
+    .hero-content {
       display: flex;
-      justify-content: center;
       align-items: center;
-      margin-bottom: 14px;
+      justify-content: flex-start;
+      gap: 16px;
     }
 
     .logo {
-      max-width: 120px;
-      max-height: 120px;
+      width: 76px;
+      height: 76px;
       object-fit: contain;
-      border-radius: 18px;
-      background: white;
-      padding: 8px;
+      display: block;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      box-shadow: none;
+    }
+
+    .hero-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .hero h1 {
       margin: 0;
-      font-size: 28px;
-      line-height: 1.2;
+      font-size: 30px;
+      line-height: 1.1;
+      letter-spacing: 0.3px;
     }
 
     .hero p {
       margin: 8px 0 0;
-      color: #d1d5db;
+      color: var(--muted);
       font-size: 14px;
     }
 
@@ -87,7 +100,7 @@
       border-radius: 18px;
       padding: 16px;
       margin-bottom: 14px;
-      box-shadow: 0 4px 14px rgba(17, 24, 39, 0.05);
+      box-shadow: none;
     }
 
     .label {
@@ -100,12 +113,14 @@
       font-size: 27px;
       font-weight: 700;
       line-height: 1.2;
+      color: var(--text);
     }
 
     .section-title {
       font-size: 18px;
       font-weight: 700;
       margin: 22px 0 10px;
+      color: var(--text);
     }
 
     .filters {
@@ -117,7 +132,7 @@
 
     .filter-btn {
       border: 1px solid var(--border);
-      background: white;
+      background: var(--card);
       color: var(--text);
       border-radius: 999px;
       padding: 9px 13px;
@@ -128,7 +143,7 @@
 
     .filter-btn.active {
       background: var(--accent);
-      color: white;
+      color: #050505;
       border-color: var(--accent);
     }
 
@@ -140,20 +155,26 @@
     input {
       flex: 1;
       border: 1px solid var(--border);
+      background: #0a0a0a;
+      color: var(--text);
       border-radius: 12px;
       padding: 13px;
       font-size: 15px;
       outline: none;
     }
 
+    input::placeholder {
+      color: #737373;
+    }
+
     input:focus {
-      border-color: var(--accent);
+      border-color: var(--accent-dark);
     }
 
     button {
       border: 0;
       background: var(--accent);
-      color: white;
+      color: #050505;
       border-radius: 12px;
       padding: 13px 16px;
       font-weight: 700;
@@ -177,7 +198,7 @@
       display: none;
       background: var(--error-bg);
       color: var(--error-text);
-      border: 1px solid #fecaca;
+      border: 1px solid #7f1d1d;
       padding: 12px;
       border-radius: 12px;
       margin-top: 12px;
@@ -189,12 +210,14 @@
       display: none;
       border-left: 5px solid var(--accent);
       margin-top: 12px;
+      background: var(--card-soft);
     }
 
     .result-title {
       font-size: 21px;
       font-weight: 700;
       margin-bottom: 10px;
+      color: var(--text);
     }
 
     .row {
@@ -216,6 +239,7 @@
 
     .row strong {
       text-align: right;
+      color: var(--text);
     }
 
     .ranking-item {
@@ -235,7 +259,8 @@
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      background: #f3f4f6;
+      background: #262626;
+      color: var(--text);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -244,6 +269,7 @@
 
     .athlete-id {
       font-weight: 700;
+      color: var(--text);
     }
 
     .small {
@@ -272,11 +298,12 @@
       gap: 12px;
       font-size: 14px;
       margin-bottom: 6px;
+      color: var(--text);
     }
 
     .bar-bg {
       height: 10px;
-      background: #e5e7eb;
+      background: #262626;
       border-radius: 999px;
       overflow: hidden;
     }
@@ -301,8 +328,25 @@
     }
 
     @media (max-width: 520px) {
+      .container {
+        padding: 14px;
+      }
+
       .grid {
         grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 22px 0 18px;
+      }
+
+      .hero-content {
+        gap: 12px;
+      }
+
+      .logo {
+        width: 62px;
+        height: 62px;
       }
 
       .hero h1 {
@@ -324,11 +368,6 @@
       .ranking-item {
         grid-template-columns: 38px 1fr auto;
       }
-
-      .logo {
-        max-width: 100px;
-        max-height: 100px;
-      }
     }
   </style>
 </head>
@@ -337,12 +376,14 @@
   <div class="container">
 
     <section class="hero">
-      <div class="logo-box">
-        <img src="logo.PNG" alt="Logo Hybrid Nation" class="logo" onerror="this.style.display='none';">
-      </div>
+      <div class="hero-content">
+        <img src="logo.png" alt="Logo Hybrid Nation" class="logo" onerror="this.style.display='none';">
 
-      <h1>Hybrid Nation</h1>
-      <p>Resultados del test físico</p>
+        <div class="hero-text">
+          <h1>Hybrid Nation</h1>
+          <p>Resultados del test físico</p>
+        </div>
+      </div>
     </section>
 
     <div id="loading" class="status">
@@ -414,111 +455,88 @@
   </div>
 
   <script>
-    const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRagh7VIkStpb_uBTyWIO2AKtjno986AWp0cDxyj7bqzQSD1zrv3TqF_UW5XcldUokWxRVwO254g7Ql/pub?gid=1016980555&single=true&output=csv';
+    const GOOGLE_SHEET_GVIZ_URL =
+      'https://docs.google.com/spreadsheets/d/e/2PACX-1vRagh7VIkStpb_uBTyWIO2AKtjno986AWp0cDxyj7bqzQSD1zrv3TqF_UW5XcldUokWxRVwO254g7Ql/gviz/tq?gid=1016980555&tqx=out:json;responseHandler:handleSheetData&tq=select%20*&cacheBust=' + new Date().getTime();
 
     let allRows = [];
     let currentGenderFilter = 'Todos';
 
-    loadData();
+    loadDataWithJsonp();
 
-    function loadData() {
-      const urlWithCacheBust = GOOGLE_SHEET_CSV_URL + '&cacheBust=' + new Date().getTime();
+    setTimeout(() => {
+      const loading = document.getElementById('loading');
+      const app = document.getElementById('app');
 
-      fetch(urlWithCacheBust, { cache: 'no-store' })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('No se pudo cargar la hoja publicada de Google Sheets.');
-          }
-          return response.text();
-        })
-        .then(csv => {
-          allRows = parseCSV(csv)
-            .filter(row => row.ID_ATLETA && String(row.ID_ATLETA).trim() !== '');
-
-          renderDashboard(getFilteredRows());
-        })
-        .catch(error => {
-          document.getElementById('loading').innerHTML =
-            '<div class="error" style="display:block;">Error cargando datos: ' +
-            escapeHTML(error.message) +
-            '<br><br>Verifica que la hoja esté publicada en formato CSV y que el enlace sea público.</div>';
-        });
-    }
-
-    function parseCSV(text) {
-      const cleanText = text.replace(/^\uFEFF/, '').trim();
-      const lines = splitCSVLines(cleanText);
-
-      if (!lines.length) return [];
-
-      const headers = parseCSVLine(lines[0]).map(header => header.trim());
-
-      return lines.slice(1).map(line => {
-        const values = parseCSVLine(line);
-        const obj = {};
-
-        headers.forEach((header, index) => {
-          obj[header] = values[index] !== undefined ? values[index].trim() : '';
-        });
-
-        return obj;
-      });
-    }
-
-    function splitCSVLines(text) {
-      const lines = [];
-      let current = '';
-      let insideQuotes = false;
-
-      for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        const next = text[i + 1];
-
-        if (char === '"' && next === '"') {
-          current += char;
-          i++;
-        } else if (char === '"') {
-          insideQuotes = !insideQuotes;
-          current += char;
-        } else if ((char === '\n' || char === '\r') && !insideQuotes) {
-          if (current.trim() !== '') lines.push(current);
-          current = '';
-          if (char === '\r' && next === '\n') i++;
-        } else {
-          current += char;
-        }
+      if (loading && app && app.style.display === 'none') {
+        loading.innerHTML = `
+          <div class="error" style="display:block;">
+            La página no pudo cargar los datos desde Google Sheets.
+            <br><br>
+            Revisa que la hoja esté publicada en la web y que el enlace corresponda a la pestaña correcta.
+          </div>
+        `;
       }
+    }, 12000);
 
-      if (current.trim() !== '') lines.push(current);
+    function loadDataWithJsonp() {
+      const script = document.createElement('script');
+      script.src = GOOGLE_SHEET_GVIZ_URL;
 
-      return lines;
+      script.onerror = function () {
+        document.getElementById('loading').innerHTML = `
+          <div class="error" style="display:block;">
+            Error cargando datos desde Google Sheets.
+            <br><br>
+            El enlace publicado no respondió correctamente.
+          </div>
+        `;
+      };
+
+      document.body.appendChild(script);
     }
 
-    function parseCSVLine(line) {
-      const result = [];
-      let current = '';
-      let insideQuotes = false;
-
-      for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        const next = line[i + 1];
-
-        if (char === '"' && next === '"') {
-          current += '"';
-          i++;
-        } else if (char === '"') {
-          insideQuotes = !insideQuotes;
-        } else if (char === ',' && !insideQuotes) {
-          result.push(current);
-          current = '';
-        } else {
-          current += char;
+    function handleSheetData(response) {
+      try {
+        if (!response || response.status === 'error') {
+          throw new Error('Google Sheets devolvió un error.');
         }
+
+        const table = response.table;
+        const headers = table.cols.map(col => String(col.label || col.id || '').trim());
+
+        allRows = table.rows.map(row => {
+          const obj = {};
+
+          headers.forEach((header, index) => {
+            const cell = row.c[index];
+
+            if (!header) return;
+
+            if (!cell) {
+              obj[header] = '';
+            } else if (cell.f !== undefined && cell.f !== null) {
+              obj[header] = cell.f;
+            } else if (cell.v !== undefined && cell.v !== null) {
+              obj[header] = cell.v;
+            } else {
+              obj[header] = '';
+            }
+          });
+
+          return obj;
+        }).filter(row => row.ID_ATLETA && String(row.ID_ATLETA).trim() !== '');
+
+        renderDashboard(getFilteredRows());
+
+      } catch (error) {
+        document.getElementById('loading').innerHTML = `
+          <div class="error" style="display:block;">
+            Error procesando los datos: ${escapeHTML(error.message)}
+            <br><br>
+            Verifica que los encabezados de Google Sheets coincidan exactamente con los nombres esperados.
+          </div>
+        `;
       }
-
-      result.push(current);
-
-      return result;
     }
 
     function numberValue(value) {
