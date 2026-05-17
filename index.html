@@ -455,88 +455,121 @@
   </div>
 
   <script>
-    const GOOGLE_SHEET_GVIZ_URL =
-      'https://docs.google.com/spreadsheets/d/e/2PACX-1vRagh7VIkStpb_uBTyWIO2AKtjno986AWp0cDxyj7bqzQSD1zrv3TqF_UW5XcldUokWxRVwO254g7Ql/gviz/tq?gid=1016980555&tqx=out:json;responseHandler:handleSheetData&tq=select%20*&cacheBust=' + new Date().getTime();
+    const GOOGLE_SHEET_CSV_URL =
+      'https://docs.google.com/spreadsheets/d/e/2PACX-1vRagh7VIkStpb_uBTyWIO2AKtjno986AWp0cDxyj7bqzQSD1zrv3TqF_UW5XcldUokWxRVwO254g7Ql/pub?gid=1016980555&single=true&output=csv';
 
     let allRows = [];
     let currentGenderFilter = 'Todos';
 
-    loadDataWithJsonp();
+    loadData();
 
-    setTimeout(() => {
-      const loading = document.getElementById('loading');
-      const app = document.getElementById('app');
+    function loadData() {
+      const urlWithCacheBust = GOOGLE_SHEET_CSV_URL + '&cacheBust=' + new Date().getTime();
 
-      if (loading && app && app.style.display === 'none') {
-        loading.innerHTML = `
-          <div class="error" style="display:block;">
-            La página no pudo cargar los datos desde Google Sheets.
-            <br><br>
-            Revisa que la hoja esté publicada en la web y que el enlace corresponda a la pestaña correcta.
-          </div>
-        `;
-      }
-    }, 12000);
+      fetch(urlWithCacheBust, { cache: 'no-store' })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('No se pudo cargar la hoja publicada de Google Sheets.');
+          }
 
-    function loadDataWithJsonp() {
-      const script = document.createElement('script');
-      script.src = GOOGLE_SHEET_GVIZ_URL;
+          return response.text();
+        })
+        .then(csv => {
+          allRows = parseCSV(csv)
+            .filter(row => row.ID_ATLETA && String(row.ID_ATLETA).trim() !== '');
 
-      script.onerror = function () {
-        document.getElementById('loading').innerHTML = `
-          <div class="error" style="display:block;">
-            Error cargando datos desde Google Sheets.
-            <br><br>
-            El enlace publicado no respondió correctamente.
-          </div>
-        `;
-      };
-
-      document.body.appendChild(script);
+          renderDashboard(getFilteredRows());
+        })
+        .catch(error => {
+          document.getElementById('loading').innerHTML = `
+            <div class="error" style="display:block;">
+              Error cargando datos: ${escapeHTML(error.message)}
+              <br><br>
+              Verifica que la hoja esté publicada como CSV y que el enlace sea público.
+            </div>
+          `;
+        });
     }
 
-    function handleSheetData(response) {
-      try {
-        if (!response || response.status === 'error') {
-          throw new Error('Google Sheets devolvió un error.');
+    function parseCSV(text) {
+      const cleanText = text.replace(/^\uFEFF/, '').trim();
+      const lines = splitCSVLines(cleanText);
+
+      if (!lines.length) return [];
+
+      const headers = parseCSVLine(lines[0]).map(header => header.trim());
+
+      return lines.slice(1).map(line => {
+        const values = parseCSVLine(line);
+        const obj = {};
+
+        headers.forEach((header, index) => {
+          obj[header] = values[index] !== undefined ? values[index].trim() : '';
+        });
+
+        return obj;
+      });
+    }
+
+    function splitCSVLines(text) {
+      const lines = [];
+      let current = '';
+      let insideQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (char === '"' && next === '"') {
+          current += char;
+          i++;
+        } else if (char === '"') {
+          insideQuotes = !insideQuotes;
+          current += char;
+        } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+          if (current.trim() !== '') lines.push(current);
+          current = '';
+
+          if (char === '\r' && next === '\n') {
+            i++;
+          }
+        } else {
+          current += char;
         }
-
-        const table = response.table;
-        const headers = table.cols.map(col => String(col.label || col.id || '').trim());
-
-        allRows = table.rows.map(row => {
-          const obj = {};
-
-          headers.forEach((header, index) => {
-            const cell = row.c[index];
-
-            if (!header) return;
-
-            if (!cell) {
-              obj[header] = '';
-            } else if (cell.f !== undefined && cell.f !== null) {
-              obj[header] = cell.f;
-            } else if (cell.v !== undefined && cell.v !== null) {
-              obj[header] = cell.v;
-            } else {
-              obj[header] = '';
-            }
-          });
-
-          return obj;
-        }).filter(row => row.ID_ATLETA && String(row.ID_ATLETA).trim() !== '');
-
-        renderDashboard(getFilteredRows());
-
-      } catch (error) {
-        document.getElementById('loading').innerHTML = `
-          <div class="error" style="display:block;">
-            Error procesando los datos: ${escapeHTML(error.message)}
-            <br><br>
-            Verifica que los encabezados de Google Sheets coincidan exactamente con los nombres esperados.
-          </div>
-        `;
       }
+
+      if (current.trim() !== '') {
+        lines.push(current);
+      }
+
+      return lines;
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let insideQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const next = line[i + 1];
+
+        if (char === '"' && next === '"') {
+          current += '"';
+          i++;
+        } else if (char === '"') {
+          insideQuotes = !insideQuotes;
+        } else if (char === ',' && !insideQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+
+      result.push(current);
+
+      return result;
     }
 
     function numberValue(value) {
@@ -555,11 +588,14 @@
       }
 
       const number = Number(text);
+
       return isNaN(number) ? 0 : number;
     }
 
     function average(values) {
-      const clean = values.map(numberValue).filter(value => !isNaN(value));
+      const clean = values
+        .map(numberValue)
+        .filter(value => !isNaN(value));
 
       if (!clean.length) return 0;
 
@@ -639,6 +675,7 @@
       }
 
       const parsed = new Date(text);
+
       return isNaN(parsed.getTime()) ? new Date(0) : parsed;
     }
 
