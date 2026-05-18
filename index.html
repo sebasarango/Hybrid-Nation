@@ -813,7 +813,7 @@
 
       const ranking = [...data]
         .sort((a, b) => numberValue(b.SCORE_TOTAL_24) - numberValue(a.SCORE_TOTAL_24))
-        .slice(0, 20);
+        .slice(0, 5);
 
       if (!ranking.length) {
         container.innerHTML = `<div class="empty">${escapeHTML(emptyMessage)}</div>`;
