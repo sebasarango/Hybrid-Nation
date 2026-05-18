@@ -272,8 +272,6 @@
       color: var(--text);
     }
 
-    
-
     .small {
       font-size: 13px;
       color: var(--muted);
@@ -465,6 +463,18 @@
 
     loadData();
 
+    document.addEventListener('DOMContentLoaded', function () {
+      const searchInput = document.getElementById('searchInput');
+
+      if (searchInput) {
+        searchInput.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') {
+            searchAthlete();
+          }
+        });
+      }
+    });
+
     function loadData() {
       const urlWithCacheBust = GOOGLE_SHEET_CSV_URL + '&cacheBust=' + new Date().getTime();
 
@@ -575,7 +585,7 @@
     }
 
     function numberValue(value) {
-      if (value === undefined || value === null || value === '') return 0;
+      if (value === undefined || value === null || String(value).trim() === '') return 0;
 
       let text = String(value).trim().replace(/\s/g, '');
 
@@ -594,10 +604,32 @@
       return isNaN(number) ? 0 : number;
     }
 
+    function numberValueForAverage(value) {
+      if (value === undefined || value === null || String(value).trim() === '') {
+        return null;
+      }
+
+      let text = String(value).trim().replace(/\s/g, '');
+
+      if (text.includes(',') && !text.includes('.')) {
+        text = text.replace(',', '.');
+      } else if (text.includes(',') && text.includes('.')) {
+        if (text.lastIndexOf(',') > text.lastIndexOf('.')) {
+          text = text.replace(/\./g, '').replace(',', '.');
+        } else {
+          text = text.replace(/,/g, '');
+        }
+      }
+
+      const number = Number(text);
+
+      return isNaN(number) ? null : number;
+    }
+
     function average(values) {
       const clean = values
-        .map(numberValue)
-        .filter(value => !isNaN(value));
+        .map(numberValueForAverage)
+        .filter(value => value !== null);
 
       if (!clean.length) return 0;
 
@@ -631,6 +663,7 @@
 
       button.classList.add('active');
 
+      clearSearchResult();
       renderDashboard(getFilteredRows());
     }
 
@@ -650,22 +683,33 @@
       document.getElementById('latestDate').textContent = latestDate || '-';
 
       renderAverageTests(data);
-      renderRankingsSeparated(allRows);
+      renderRankingsSeparated(data);
     }
 
     function getLatestDate(data) {
       const dates = data
         .map(row => row.FECHA_TEST)
         .filter(Boolean)
-        .sort((a, b) => parseDateFlexible(a) - parseDateFlexible(b));
+        .map(value => ({
+          raw: value,
+          parsed: parseDateFlexible(value)
+        }))
+        .filter(item => !isNaN(item.parsed.getTime()) && item.parsed.getTime() > 0)
+        .sort((a, b) => a.parsed - b.parsed);
 
-      return dates.length ? dates[dates.length - 1] : '';
+      return dates.length ? formatDateValue(dates[dates.length - 1].raw) : '';
     }
 
     function parseDateFlexible(value) {
       const text = String(value || '').trim();
 
       if (!text) return new Date(0);
+
+      if (/^\d+(\.\d+)?$/.test(text)) {
+        const serial = Number(text);
+        const excelEpoch = new Date(1899, 11, 30);
+        return new Date(excelEpoch.getTime() + serial * 86400000);
+      }
 
       if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
         return new Date(text + 'T00:00:00');
@@ -681,13 +725,31 @@
       return isNaN(parsed.getTime()) ? new Date(0) : parsed;
     }
 
+    function formatDateValue(value) {
+      const text = String(value || '').trim();
+
+      if (!text) return '-';
+
+      const date = parseDateFlexible(text);
+
+      if (isNaN(date.getTime()) || date.getTime() === 0) {
+        return text;
+      }
+
+      return date.toLocaleDateString('es-CO', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    }
+
     function renderAverageTests(data) {
       const tests = {
         'Pull-ups': 'PTS_PULL_UPS',
         'Push-ups': 'PTS_PUSH_UPS',
         'Plank': 'PTS_PLANK',
         'Run 1K': 'PTS_RUN_1K',
-        'Dead hang': 'DEADHANG',
+        'Dead Hang': 'PTS_DEADHANG',
         'Sprint': 'PTS_SPRINT'
       };
 
@@ -701,7 +763,7 @@
 
       Object.entries(tests).forEach(([label, field]) => {
         const value = average(data.map(row => row[field]));
-        const percentage = Math.min((value / 4) * 100, 100);
+        const percentage = Math.min(Math.max((value / 4) * 100, 0), 100);
 
         container.innerHTML += `
           <div class="bar-row">
@@ -749,11 +811,13 @@
       container.innerHTML = '';
 
       ranking.forEach((item, index) => {
+        const displayName = item.NOMBRE_COMPLETO || item.ID_ATLETA || '-';
+
         container.innerHTML += `
           <div class="ranking-item">
             <div class="position">${index + 1}</div>
             <div>
-              <div class="athlete-name">${escapeHTML(item.NOMBRE_COMPLETO || '-')}</div>
+              <div class="athlete-name">${escapeHTML(displayName)}</div>
               <div class="small">${escapeHTML(item.NIVEL || '')}</div>
             </div>
             <div class="score">${numberValue(item.SCORE_TOTAL_24)} pts</div>
@@ -784,7 +848,7 @@
 
       result.innerHTML = `
         <div class="result-title">${escapeHTML(athlete.ID_ATLETA || '-')}</div>
-        <div class="row"><span>Fecha</span><strong>${escapeHTML(athlete.FECHA_TEST || '-')}</strong></div>
+        <div class="row"><span>Fecha</span><strong>${escapeHTML(formatDateValue(athlete.FECHA_TEST))}</strong></div>
         <div class="row"><span>Género</span><strong>${escapeHTML(athlete.GENERO || '-')}</strong></div>
         <div class="row"><span>Score total</span><strong>${numberValue(athlete.SCORE_TOTAL_24)} / 24</strong></div>
         <div class="row"><span>Nivel</span><strong>${escapeHTML(athlete.NIVEL || '-')}</strong></div>
@@ -792,11 +856,20 @@
         <div class="row"><span>Push-ups</span><strong>${escapeHTML(athlete.PUSH_UPS_1MIN || '0')} reps · ${escapeHTML(athlete.PTS_PUSH_UPS || '0')} pts</strong></div>
         <div class="row"><span>Plank</span><strong>${escapeHTML(athlete.PLANK_SEG || '0')} seg · ${escapeHTML(athlete.PTS_PLANK || '0')} pts</strong></div>
         <div class="row"><span>Run 1K</span><strong>${escapeHTML(athlete.RUN_1K_MMSS || athlete.RUN_1K_SEG || '-')} · ${escapeHTML(athlete.PTS_RUN_1K || '0')} pts</strong></div>
-        <div class="row"><span>Dead Hang</span><strong>${escapeHTML(athlete.DEADHANG || '0')} reps · ${escapeHTML(athlete.PTS_DEADHANG || '0')} pts</strong></div>
+        <div class="row"><span>Dead Hang</span><strong>${escapeHTML(athlete.DEADHANG || '0')} seg · ${escapeHTML(athlete.PTS_DEADHANG || '0')} pts</strong></div>
         <div class="row"><span>Sprint 100m</span><strong>${escapeHTML(athlete.SPRINT_100M_SEG || '0')} seg · ${escapeHTML(athlete.PTS_SPRINT || '0')} pts</strong></div>
       `;
 
       result.style.display = 'block';
+    }
+
+    function clearSearchResult() {
+      const error = document.getElementById('searchError');
+      const result = document.getElementById('athleteResult');
+
+      error.style.display = 'none';
+      result.style.display = 'none';
+      result.innerHTML = '';
     }
 
     function escapeHTML(value) {
