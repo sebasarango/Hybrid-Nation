@@ -267,7 +267,7 @@
       font-weight: 700;
     }
 
-    .athlete-id {
+    .athlete-name {
       font-weight: 700;
       color: var(--text);
     }
@@ -751,7 +751,7 @@
           <div class="ranking-item">
             <div class="position">${index + 1}</div>
             <div>
-              <div class="athlete-id">${escapeHTML(item.ID_ATLETA || '-')}</div>
+              <div class="athlete-name">${escapeHTML(item.NOMBRE_COMPLETO || '-')}</div>
               <div class="small">${escapeHTML(item.NIVEL || '')}</div>
             </div>
             <div class="score">${numberValue(item.SCORE_TOTAL_24)} pts</div>
