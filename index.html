@@ -123,6 +123,14 @@
       color: var(--text);
     }
 
+    .subsection-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 18px 0 8px;
+      padding-top: 4px;
+    }
+
     .filters {
       display: flex;
       gap: 8px;
@@ -830,6 +838,14 @@
       });
     }
 
+    function formatMetric(value, suffix = '') {
+      if (value === undefined || value === null || String(value).trim() === '') {
+        return '-';
+      }
+
+      return suffix ? `${value} ${suffix}` : String(value);
+    }
+
     function searchAthlete() {
       const input = document.getElementById('searchInput').value.trim().toUpperCase();
       const error = document.getElementById('searchError');
@@ -851,17 +867,33 @@
       }
 
       result.innerHTML = `
-        <div class="result-title">${escapeHTML(athlete.ID_ATLETA || '-')}</div>
+        <div class="result-title">${escapeHTML(athlete.NOMBRE_COMPLETO || 'Resultado encontrado')}</div>
+
+        <div class="subsection-title">Datos del atleta</div>
+        <div class="row"><span>Nombre completo</span><strong>${escapeHTML(formatMetric(athlete.NOMBRE_COMPLETO))}</strong></div>
+        <div class="row"><span>Edad</span><strong>${escapeHTML(formatMetric(athlete.EDAD, 'años'))}</strong></div>
+        <div class="row"><span>Género</span><strong>${escapeHTML(formatMetric(athlete.GENERO))}</strong></div>
+
+        <div class="subsection-title">Medidas corporales</div>
+        <div class="row"><span>Peso</span><strong>${escapeHTML(formatMetric(athlete.PESO_KG, 'kg'))}</strong></div>
+        <div class="row"><span>Estatura</span><strong>${escapeHTML(formatMetric(athlete.ESTATURA_M, 'm'))}</strong></div>
+        <div class="row"><span>IMC</span><strong>${escapeHTML(formatMetric(athlete.IMC))}</strong></div>
+        <div class="row"><span>Grasa corporal</span><strong>${escapeHTML(formatMetric(athlete.GRASA_PCT, '%'))}</strong></div>
+        <div class="row"><span>Masa muscular</span><strong>${escapeHTML(formatMetric(athlete.MASA_MUSCULAR_PCT, '%'))}</strong></div>
+        <div class="row"><span>Metabolismo basal</span><strong>${escapeHTML(formatMetric(athlete.METAB_BASAL_KCAL_DIA, 'kcal/día'))}</strong></div>
+        <div class="row"><span>Grasa visceral</span><strong>${escapeHTML(formatMetric(athlete.GRASA_VISCERAL))}</strong></div>
+        <div class="row"><span>Edad corporal</span><strong>${escapeHTML(formatMetric(athlete.EDAD_CORPORAL, 'años'))}</strong></div>
+
+        <div class="subsection-title">Resultados del test físico</div>
         <div class="row"><span>Fecha</span><strong>${escapeHTML(formatDateValue(athlete.FECHA_TEST))}</strong></div>
-        <div class="row"><span>Género</span><strong>${escapeHTML(athlete.GENERO || '-')}</strong></div>
         <div class="row"><span>Score total</span><strong>${numberValue(athlete.SCORE_TOTAL_24)} / 24</strong></div>
-        <div class="row"><span>Nivel</span><strong>${escapeHTML(athlete.NIVEL || '-')}</strong></div>
-        <div class="row"><span>Pull-ups</span><strong>${escapeHTML(athlete.PULL_UPS_REPS || '0')} reps · ${escapeHTML(athlete.PTS_PULL_UPS || '0')} pts</strong></div>
-        <div class="row"><span>Push-ups</span><strong>${escapeHTML(athlete.PUSH_UPS_1MIN || '0')} reps · ${escapeHTML(athlete.PTS_PUSH_UPS || '0')} pts</strong></div>
-        <div class="row"><span>Plank</span><strong>${escapeHTML(athlete.PLANK_SEG || '0')} seg · ${escapeHTML(athlete.PTS_PLANK || '0')} pts</strong></div>
-        <div class="row"><span>Run 1K</span><strong>${escapeHTML(athlete.RUN_1K_MMSS || athlete.RUN_1K_SEG || '-')} · ${escapeHTML(athlete.PTS_RUN_1K || '0')} pts</strong></div>
-        <div class="row"><span>Dead Hang</span><strong>${escapeHTML(athlete.DEADHANG || '0')} seg · ${escapeHTML(athlete.PTS_DEADHANG || '0')} pts</strong></div>
-        <div class="row"><span>Sprint 100m</span><strong>${escapeHTML(athlete.SPRINT_100M_SEG || '0')} seg · ${escapeHTML(athlete.PTS_SPRINT || '0')} pts</strong></div>
+        <div class="row"><span>Nivel</span><strong>${escapeHTML(formatMetric(athlete.NIVEL))}</strong></div>
+        <div class="row"><span>Pull-ups</span><strong>${escapeHTML(formatMetric(athlete.PULL_UPS_REPS, 'reps'))} · ${escapeHTML(formatMetric(athlete.PTS_PULL_UPS, 'pts'))}</strong></div>
+        <div class="row"><span>Push-ups</span><strong>${escapeHTML(formatMetric(athlete.PUSH_UPS_1MIN, 'reps'))} · ${escapeHTML(formatMetric(athlete.PTS_PUSH_UPS, 'pts'))}</strong></div>
+        <div class="row"><span>Plank</span><strong>${escapeHTML(formatMetric(athlete.PLANK_SEG, 'seg'))} · ${escapeHTML(formatMetric(athlete.PTS_PLANK, 'pts'))}</strong></div>
+        <div class="row"><span>Run 1K</span><strong>${escapeHTML(formatMetric(athlete.RUN_1K_MMSS || athlete.RUN_1K_SEG))} · ${escapeHTML(formatMetric(athlete.PTS_RUN_1K, 'pts'))}</strong></div>
+        <div class="row"><span>Dead Hang</span><strong>${escapeHTML(formatMetric(athlete.DEADHANG, 'seg'))} · ${escapeHTML(formatMetric(athlete.PTS_DEADHANG, 'pts'))}</strong></div>
+        <div class="row"><span>Sprint 100m</span><strong>${escapeHTML(formatMetric(athlete.SPRINT_100M_SEG, 'seg'))} · ${escapeHTML(formatMetric(athlete.PTS_SPRINT, 'pts'))}</strong></div>
       `;
 
       result.style.display = 'block';
