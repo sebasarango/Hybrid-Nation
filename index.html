@@ -796,6 +796,10 @@
       );
     }
 
+    function getAthleteDisplayName(item) {
+      return item.NOMBRE_COMPLETO || item.ID_ATLETA || '-';
+    }
+
     function renderRankingList(containerId, data, emptyMessage) {
       const container = document.getElementById(containerId);
 
@@ -811,7 +815,7 @@
       container.innerHTML = '';
 
       ranking.forEach((item, index) => {
-        const displayName = item.NOMBRE_COMPLETO || item.ID_ATLETA || '-';
+        const displayName = getAthleteDisplayName(item);
 
         container.innerHTML += `
           <div class="ranking-item">
